@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test de estilos de conflicto</title>
+<style>
+  :root {
+    --bg: #eef1f5;
+    --surface: #ffffff;
+    --ink: #14213d;
+    --muted: #55607a;
+    --line: #d3d9e4;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --warn: #b45309;
+    --bar-bg: #e3e8ef;
+    --focus: #1d4ed8;
+    --c-competir: #b91c1c;
+    --c-colaborar: #0f766e;
+    --c-comprometer: #1d4ed8;
+    --c-evitar: #6b7280;
+    --c-acomodar: #b45309;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1626;
+      --surface: #16213a;
+      --ink: #e8edf7;
+      --muted: #a3afc6;
+      --line: #2c3a5a;
+      --accent: #2dd4bf;
+      --accent-ink: #06201d;
+      --warn: #fbbf24;
+      --bar-bg: #23304d;
+      --focus: #93c5fd;
+      --c-competir: #f87171;
+      --c-colaborar: #2dd4bf;
+      --c-comprometer: #7aa7ff;
+      --c-evitar: #9ca3af;
+      --c-acomodar: #fbbf24;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 18px 80px; }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; line-height: 1.2; margin: 0; }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); }
+  h2 { font-size: 1.5rem; margin-bottom: 8px; }
+  h3 { font-size: 1.15rem; }
+  p { margin: 0 0 12px; }
+  .lead { color: var(--muted); font-size: 1.05rem; max-width: 62ch; margin-top: 12px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px;
+    margin-top: 22px;
+  }
+  .instr ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
+  .instr li { margin-bottom: 4px; }
+  .progress {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--bg);
+    padding: 12px 0 10px;
+    margin-top: 18px;
+  }
+  .progress-row { display: flex; justify-content: space-between; font-size: .9rem; color: var(--muted); margin-bottom: 6px; }
+  .track { height: 8px; background: var(--bar-bg); border-radius: 4px; overflow: hidden; }
+  .fill { height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+  fieldset.q { border: 0; margin: 0; padding: 0; }
+  .q + .q { margin-top: 0; }
+  .q-item { padding: 18px 0; border-top: 1px solid var(--line); }
+  .q-item:first-child { border-top: 0; padding-top: 4px; }
+  .q-item.missing { background: rgba(180, 83, 9, .10); border-radius: 8px; padding-left: 10px; padding-right: 10px; }
+  legend { padding: 0; font-size: 1.02rem; font-weight: 600; margin-bottom: 10px; max-width: 64ch; }
+  .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .scale label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 4px;
+    cursor: pointer;
+    font-size: .8rem;
+    color: var(--muted);
+    min-height: 58px;
+    background: var(--surface);
+  }
+  .scale label strong { font-size: 1.1rem; color: var(--ink); }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale label:hover { border-color: var(--accent); }
+  .scale input:checked + span, .scale input:checked ~ span { color: inherit; }
+  .scale label:has(input:checked) { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .scale label:has(input:checked) strong { color: var(--accent-ink); }
+  .scale label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+  @media (max-width: 520px) {
+    .scale { gap: 5px; }
+    .scale label { font-size: .68rem; padding: 8px 2px; }
+  }
+  button {
+    font: inherit; font-weight: 600;
+    border-radius: 8px; padding: 12px 22px; cursor: pointer;
+    border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  }
+  button.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  button:hover { filter: brightness(1.07); }
+  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .msg { color: var(--warn); font-weight: 600; margin-top: 12px; min-height: 1.4em; }
+  #results { display: none; }
+  .bar-row { margin-top: 16px; }
+  .bar-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 5px; }
+  .bar-head span:last-child { color: var(--muted); font-size: .92rem; white-space: nowrap; }
+  .bar { height: 16px; background: var(--bar-bg); border-radius: 5px; overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 5px; width: 0; transition: width .5s ease; }
+  .tag {
+    display: inline-block; font-size: .78rem; font-weight: 600;
+    border: 1px solid var(--line); border-radius: 999px; padding: 1px 9px; margin-left: 6px; color: var(--muted);
+  }
+  .tag.top { border-color: var(--accent); color: var(--accent); }
+  .desc { border-left: 4px solid var(--line); padding-left: 14px; margin-top: 18px; }
+  .desc dl { margin: 8px 0 0; }
+  .desc dt { font-weight: 600; margin-top: 6px; }
+  .desc dd { margin: 0; color: var(--muted); }
+  .map-wrap { display: flex; justify-content: center; margin-top: 10px; }
+  svg text { font-family: "Segoe UI", system-ui, sans-serif; fill: var(--muted); font-size: 12px; }
+  svg .lbl { fill: var(--ink); font-weight: 600; }
+  .note { font-size: .86rem; color: var(--muted); margin-top: 22px; }
+  @media print {
+    .progress, .actions, #quiz, .instr { display: none !important; }
+    #results { display: block !important; }
+    body { background: #fff; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fill, .bar > div { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Test de estilos de conflicto</h1>
+    <p class="lead">Un instrumento breve para reconocer cómo sueles actuar cuando tus intereses chocan con los de otra persona. Sirve como línea base de autoconocimiento antes de practicar negociación.</p>
+  </header>
+
+  <section class="card instr" id="intro">
+    <h2>Antes de comenzar</h2>
+    <ul>
+      <li>Son 30 afirmaciones. Toma entre 5 y 8 minutos.</li>
+      <li>Piensa en cómo reaccionas <strong>habitualmente</strong> cuando tu postura choca con la de otra persona: en el trabajo, los estudios, la familia o las amistades.</li>
+      <li>Responde según lo que realmente haces, no según lo que crees que sería ideal. No hay respuestas correctas ni incorrectas.</li>
+      <li>Al terminar verás tu puntaje por estilo, calculado automáticamente.</li>
+    </ul>
+  </section>
+
+  <div class="progress" id="progress" aria-live="polite">
+    <div class="progress-row"><span id="pcount">0 de 30 respondidas</span><span id="ppct">0%</span></div>
+    <div class="track"><div class="fill" id="pfill"></div></div>
+  </div>
+
+  <form id="quiz" class="card" novalidate>
+    <div id="questions"></div>
+    <div class="msg" id="msg" role="alert"></div>
+    <div class="actions">
+      <button type="submit">Ver mis resultados</button>
+    </div>
+  </form>
+
+  <section id="results" class="card" aria-live="polite">
+    <h2>Tus resultados</h2>
+    <p id="summary" class="lead" style="margin-top:0"></p>
+    <div id="bars"></div>
+
+    <h3 style="margin-top:28px">Mapa de preocupaciones</h3>
+    <p style="color:var(--muted);margin-top:6px">Cada estilo combina cuánto defiendes tus propios intereses (asertividad) y cuánto atiendes los de la otra persona (cooperación). El tamaño del círculo refleja tu puntaje.</p>
+    <div class="map-wrap" id="map"></div>
+
+    <div id="detail"></div>
+
+    <div class="actions">
+      <button type="button" id="copy">Copiar resultados</button>
+      <button type="button" class="ghost" id="print">Imprimir o guardar PDF</button>
+      <button type="button" class="ghost" id="restart">Repetir el test</button>
+    </div>
+    <div class="msg" id="copymsg" style="color:var(--accent)"></div>
+  </section>
+
+  <p class="note">Este test es una herramienta de autoconocimiento con fines educativos. No es un instrumento psicométrico validado ni reemplaza a pruebas comerciales. Se basa en el modelo conceptual de dos dimensiones (asertividad y cooperación) usado ampliamente en la literatura de negociación. Un estilo no es una característica fija: la mayoría de las personas usa varios según la situación.</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var STYLES = {
+    competir: {
+      name: "Competir", color: "var(--c-competir)", asert: 1, coop: 0,
+      resumen: "Defiendes tus intereses con firmeza, incluso a costa de la otra parte.",
+      util: "Cuando se requiere una decisión rápida, hay una urgencia real, o debes proteger algo esencial frente a una propuesta que consideras injusta.",
+      riesgo: "Puede dañar la relación, cerrar la conversación y llevar a la otra parte a resistirse o a represalias futuras.",
+      pregunta: "¿Qué estoy dejando de ganar al no escuchar los intereses de la otra parte?"
+    },
+    colaborar: {
+      name: "Colaborar", color: "var(--c-colaborar)", asert: 1, coop: 1,
+      resumen: "Buscas una solución que satisfaga plenamente los intereses de ambas partes.",
+      util: "Cuando el tema es importante para ambos, hay tiempo para explorar y la relación seguirá en el futuro.",
+      riesgo: "Consume tiempo y energía; puede ser ineficiente en asuntos menores o cuando la otra parte no está dispuesta a cooperar.",
+      pregunta: "¿Este asunto justifica la inversión de tiempo que implica explorar todos los intereses?"
+    },
+    comprometer: {
+      name: "Comprometer", color: "var(--c-comprometer)", asert: 0.5, coop: 0.5,
+      resumen: "Buscas un punto medio en que ambas partes ceden algo para cerrar el tema.",
+      util: "Cuando hay poco tiempo, los objetivos son moderadamente importantes o se necesita una solución temporal.",
+      riesgo: "Puedes quedarte con un acuerdo mediocre sin descubrir soluciones creativas que generaban más valor para ambos.",
+      pregunta: "¿Cedimos demasiado pronto, antes de explorar si había una opción mejor para ambas partes?"
+    },
+    evitar: {
+      name: "Evitar", color: "var(--c-evitar)", asert: 0, coop: 0,
+      resumen: "Postergas, esquivas o te retiras del conflicto sin abordarlo.",
+      util: "Cuando el tema es trivial, el momento es inadecuado, necesitas enfriar emociones o recopilar información antes de actuar.",
+      riesgo: "Los problemas se acumulan, se pierden oportunidades y otras personas deciden por ti.",
+      pregunta: "¿Qué costo tiene para mí que este asunto siga sin resolverse?"
+    },
+    acomodar: {
+      name: "Acomodar", color: "var(--c-acomodar)", asert: 0, coop: 1,
+      resumen: "Priorizas los intereses de la otra parte y cedes para conservar la relación.",
+      util: "Cuando el asunto importa mucho más a la otra persona, cuando reconoces que te equivocaste o cuando quieres ganar buena voluntad.",
+      riesgo: "Tus necesidades quedan sin atender, puede generar resentimiento y se te puede percibir como alguien que siempre cede.",
+      pregunta: "¿Estoy cediendo por una decisión consciente o por incomodidad ante el desacuerdo?"
+    }
+  };
+
+  var ITEMS = [
+    ["competir", "Defiendo mi posición con firmeza hasta que la otra parte cede."],
+    ["competir", "Cuando estoy convencido o convencida de tener la razón, no me preocupa que la otra persona quede disconforme."],
+    ["competir", "Busco imponer mi solución porque creo que es la mejor."],
+    ["competir", "Prefiero ganar una discusión a perder terreno en lo que me importa."],
+    ["competir", "Uso mi experiencia, mi cargo o mis argumentos de fuerza para inclinar la decisión a mi favor."],
+    ["competir", "En un desacuerdo, me concentro en que se haga lo que yo propuse."],
+
+    ["colaborar", "Pregunto a la otra persona qué es lo que realmente necesita, más allá de lo que pide."],
+    ["colaborar", "Propongo trabajar juntos para encontrar una solución que satisfaga plenamente a ambas partes."],
+    ["colaborar", "Dedico tiempo a poner todos los intereses sobre la mesa antes de decidir."],
+    ["colaborar", "Veo los desacuerdos como una oportunidad para llegar a una idea mejor que la inicial."],
+    ["colaborar", "Estoy dispuesto o dispuesta a invertir esfuerzo extra para que nadie tenga que renunciar a lo esencial."],
+    ["colaborar", "Comparto abiertamente mis intereses y espero que la otra parte haga lo mismo."],
+
+    ["comprometer", "Propongo dividir la diferencia para cerrar el tema rápido."],
+    ["comprometer", "Acepto ceder en algo si la otra parte también cede en algo."],
+    ["comprometer", "Busco un punto medio razonable, aunque nadie obtenga todo lo que quería."],
+    ["comprometer", "Cuando el tiempo apremia, prefiero un acuerdo parcial a seguir discutiendo."],
+    ["comprometer", "Ofrezco pequeñas concesiones para destrabar la conversación."],
+    ["comprometer", "Pienso que un buen acuerdo es aquel en que ambas partes ganan un poco y pierden un poco."],
+
+    ["evitar", "Dejo pasar los desacuerdos con la esperanza de que se resuelvan solos."],
+    ["evitar", "Cambio de tema o postergo la conversación cuando el ambiente se tensa."],
+    ["evitar", "Prefiero no involucrarme en discusiones que no son estrictamente necesarias."],
+    ["evitar", "Me alejo de la situación para no escalar el conflicto."],
+    ["evitar", "Evito plantear temas incómodos a otras personas."],
+    ["evitar", "Si puedo, dejo que otra persona enfrente la situación conflictiva."],
+
+    ["acomodar", "Cedo con facilidad para mantener una buena relación con la otra persona."],
+    ["acomodar", "Si algo le importa mucho más a la otra parte que a mí, le dejo la decisión."],
+    ["acomodar", "Pongo las necesidades de los demás por delante de las mías para evitar tensiones."],
+    ["acomodar", "Acepto la propuesta de la otra persona aunque yo habría hecho algo distinto."],
+    ["acomodar", "Prefiero conservar la armonía antes que insistir en mi punto de vista."],
+    ["acomodar", "Suelo dar la razón para que la discusión termine en buenos términos."]
+  ];
+
+  var LABELS = ["Nunca", "Pocas veces", "A veces", "Frecuentemente", "Siempre"];
+  var ORDER = ["competir", "colaborar", "comprometer", "evitar", "acomodar"];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var order = [];
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function build() {
+    order = shuffle(ITEMS.map(function (_, i) { return i; }));
+    var html = "";
+    order.forEach(function (idx, pos) {
+      var n = pos + 1;
+      html += '<div class="q-item" id="qi' + idx + '"><fieldset class="q"><legend>' + n + ". " + ITEMS[idx][1] + '</legend><div class="scale">';
+      for (var v = 1; v <= 5; v++) {
+        html += '<label><input type="radio" name="q' + idx + '" value="' + v + '"><strong>' + v + "</strong><span>" + LABELS[v - 1] + "</span></label>";
+      }
+      html += "</div></fieldset></div>";
+    });
+    $("questions").innerHTML = html;
+  }
+
+  function answered() {
+    var c = 0;
+    for (var i = 0; i < ITEMS.length; i++) {
+      if (document.querySelector('input[name="q' + i + '"]:checked')) c++;
+    }
+    return c;
+  }
+
+  function updateProgress() {
+    var c = answered();
+    var pct = Math.round((c / ITEMS.length) * 100);
+    $("pcount").textContent = c + " de " + ITEMS.length + " respondidas";
+    $("ppct").textContent = pct + "%";
+    $("pfill").style.width = pct + "%";
+  }
+
+  function level(score) {
+    if (score >= 23) return "Alto";
+    if (score >= 16) return "Medio";
+    return "Bajo";
+  }
+
+  var lastText = "";
+
+  function compute() {
+    var totals = {};
+    ORDER.forEach(function (k) { totals[k] = 0; });
+    ITEMS.forEach(function (it, i) {
+      var el = document.querySelector('input[name="q' + i + '"]:checked');
+      totals[it[0]] += parseInt(el.value, 10);
+    });
+    return totals;
+  }
+
+  function render(totals) {
+    var max = Math.max.apply(null, ORDER.map(function (k) { return totals[k]; }));
+    var tops = ORDER.filter(function (k) { return totals[k] === max; });
+
+    var names = tops.map(function (k) { return STYLES[k].name; });
+    var s = names.length === 1
+      ? "Tu estilo predominante es " + names[0] + " (" + max + " de 30). " + STYLES[tops[0]].resumen
+      : "Tienes un empate entre los estilos " + names.join(" y ") + " (" + max + " de 30 cada uno). Usas ambos con una frecuencia similar.";
+    $("summary").textContent = s;
+
+    var bars = "";
+    ORDER.forEach(function (k) {
+      var t = totals[k];
+      var pct = Math.round(((t - 6) / 24) * 100);
+      var isTop = tops.indexOf(k) !== -1;
+      bars += '<div class="bar-row"><div class="bar-head"><span><strong>' + STYLES[k].name + '</strong><span class="tag' + (isTop ? " top" : "") + '">' + (isTop ? "Predominante · " : "") + level(t) + '</span></span><span>' + t + " / 30</span></div>" +
+        '<div class="bar" role="img" aria-label="' + STYLES[k].name + ": " + t + ' de 30"><div data-w="' + Math.max(pct, 3) + '" style="background:' + STYLES[k].color + '"></div></div></div>';
+    });
+    $("bars").innerHTML = bars;
+
+    // mapa
+    var W = 360, H = 320, L = 50, R = 20, T = 20, B = 50;
+    var pw = W - L - R, ph = H - T - B;
+    var svg = '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" style="max-width:420px" role="img" aria-label="Mapa de estilos según asertividad y cooperación">';
+    svg += '<rect x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="var(--line)"/>';
+    svg += '<line x1="' + (L + pw / 2) + '" y1="' + T + '" x2="' + (L + pw / 2) + '" y2="' + (T + ph) + '" stroke="var(--line)" stroke-dasharray="4 4"/>';
+    svg += '<line x1="' + L + '" y1="' + (T + ph / 2) + '" x2="' + (L + pw) + '" y2="' + (T + ph / 2) + '" stroke="var(--line)" stroke-dasharray="4 4"/>';
+    svg += '<text x="' + (L + pw / 2) + '" y="' + (H - 12) + '" text-anchor="middle">Cooperación (atender intereses de la otra parte) →</text>';
+    svg += '<text transform="translate(14 ' + (T + ph / 2) + ') rotate(-90)" text-anchor="middle">Asertividad (defender los propios) →</text>';
+    ORDER.forEach(function (k) {
+      var st = STYLES[k];
+      var pad = 36;
+      var cx = L + pad + st.coop * (pw - 2 * pad);
+      var cy = T + ph - pad - st.asert * (ph - 2 * pad);
+      var r = 8 + ((totals[k] - 6) / 24) * 22;
+      svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + st.color + '" fill-opacity=".85"/>';
+      svg += '<text class="lbl" x="' + cx.toFixed(1) + '" y="' + (cy + r + 14).toFixed(1) + '" text-anchor="middle">' + st.name + "</text>";
+    });
+    svg += "</svg>";
+    $("map").innerHTML = svg;
+
+    // detalle
+    var det = "";
+    var show = tops.slice();
+    var lows = ORDER.filter(function (k) { return totals[k] === Math.min.apply(null, ORDER.map(function (x) { return totals[x]; })) && show.indexOf(k) === -1; });
+    show.forEach(function (k) {
+      det += blockHtml(k, "Estilo predominante");
+    });
+    if (lows.length) {
+      det += blockHtml(lows[0], "Estilo que menos usas");
+    }
+    $("detail").innerHTML = '<h3 style="margin-top:28px">Para reflexionar</h3>' + det;
+
+    // texto copiable
+    var lines = ["Test de estilos de conflicto — resultados (puntaje de 6 a 30 por estilo)"];
+    ORDER.forEach(function (k) { lines.push("- " + STYLES[k].name + ": " + totals[k] + "/30 (" + level(totals[k]) + ")"); });
+    lines.push("Estilo predominante: " + names.join(" y "));
+    lastText = lines.join("\n");
+
+    $("quiz").style.display = "none";
+    $("progress").style.display = "none";
+    $("intro").style.display = "none";
+    $("results").style.display = "block";
+    window.scrollTo(0, 0);
+    setTimeout(function () {
+      var els = document.querySelectorAll(".bar > div");
+      for (var i = 0; i < els.length; i++) els[i].style.width = els[i].getAttribute("data-w") + "%";
+    }, 40);
+  }
+
+  function blockHtml(k, title) {
+    var st = STYLES[k];
+    return '<div class="desc" style="border-left-color:' + st.color + '"><h3>' + st.name + " · " + title + "</h3><dl>" +
+      "<dt>Cuándo es útil</dt><dd>" + st.util + "</dd>" +
+      "<dt>Riesgo si lo usas en exceso</dt><dd>" + st.riesgo + "</dd>" +
+      "<dt>Pregunta para tu reflexión</dt><dd>" + st.pregunta + "</dd></dl></div>";
+  }
+
+  $("quiz").addEventListener("change", updateProgress);
+
+  $("quiz").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var first = null;
+    for (var i = 0; i < ITEMS.length; i++) {
+      var box = $("qi" + i);
+      var ok = document.querySelector('input[name="q' + i + '"]:checked');
+      box.classList.toggle("missing", !ok);
+    }
+    // primera pregunta sin responder en el orden en que se muestran
+    for (var p = 0; p < order.length; p++) {
+      if (!document.querySelector('input[name="q' + order[p] + '"]:checked')) { first = $("qi" + order[p]); break; }
+    }
+    if (first) {
+      var faltan = ITEMS.length - answered();
+      $("msg").textContent = "Faltan " + faltan + (faltan === 1 ? " afirmación" : " afirmaciones") + " por responder (marcadas en naranja).";
+      first.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    $("msg").textContent = "";
+    render(compute());
+  });
+
+  $("copy").addEventListener("click", function () {
+    var done = function () { $("copymsg").textContent = "Resultados copiados."; };
+    var fail = function () { $("copymsg").textContent = "No se pudo copiar automáticamente. Selecciona y copia el texto manualmente."; window.prompt("Copia tus resultados:", lastText); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lastText).then(done, fail);
+    } else { fail(); }
+  });
+
+  $("print").addEventListener("click", function () { window.print(); });
+
+  $("restart").addEventListener("click", function () {
+    $("results").style.display = "none";
+    $("quiz").style.display = "block";
+    $("progress").style.display = "block";
+    $("intro").style.display = "block";
+    $("copymsg").textContent = "";
+    build();
+    updateProgress();
+    window.scrollTo(0, 0);
+  });
+
+  build();
+  updateProgress();
+})();
+</script>
+</body>
+</html>
